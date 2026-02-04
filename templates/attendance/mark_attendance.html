@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary">📘 Period-wise Attendance</h2>
+
+    <!-- Filters / Load students -->
+    <div class="card shadow-sm mb-4 p-3">
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Grade -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Select Grade</label>
+                <select class="form-select" name="grade" required>
+                    <option value="">-- Select Grade --</option>
+                    {% for g in grade_list %}
+                        <option value="{{ g }}" {% if selected_grade == g %}selected{% endif %}>Grade {{ g }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Period -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Select Period</label>
+                <select class="form-select" name="period" required>
+                    <option value="">-- Select Period --</option>
+                    <option value="1">Period 1 (9:00–10:00)</option>
+                    <option value="2">Period 2 (10:00–11:00)</option>
+                    <option value="3">Period 3 (11:00–12:00)</option>
+                    <option value="4">Period 4 (13:00–14:00)</option>
+                    <option value="5">Period 5 (14:00–15:00)</option>
+                    <option value="6">Period 6 (15:00–16:00)</option>
+                </select>
+            </div>
+
+            <!-- Load students button -->
+            <button class="btn btn-primary w-100" name="load_students" value="1">Load Students</button>
+        </form>
+    </div>
+
+    <!-- Student List (shows only after Load Students) -->
+    <div class="card shadow-sm p-3">
+        <h4 class="mb-3">Students List</h4>
+
+        {% if students %}
+            <form method="POST">
+                {% csrf_token %}
+                <!-- preserve grade & period when saving -->
+                <input type="hidden" name="grade" value="{{ selected_grade }}">
+                <input type="hidden" name="period" value="{{ selected_period }}">
+
+                <table class="table table-bordered align-middle text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Reg. No</th>
+                            <th>Student Name</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ student.username }}</td>
+                                <td>{{ student.get_full_name }}</td>
+                                <td>
+                                    <!-- name uses student_<id> so view can read student_<id> -->
+                                    <select name="student_{{ student.id }}" class="form-select" required>
+                                        <option value="P">Present</option>
+                                        <option value="A">Absent</option>
+                                        <option value="L">Late</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <button class="btn btn-success w-100" name="save_attendance" value="1">Submit Attendance</button>
+            </form>
+        {% else %}
+            <p class="text-muted">No students loaded. Choose a grade and period, then click <strong>Load Students</strong>.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

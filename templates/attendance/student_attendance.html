@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h3 class="text-center">My Attendance</h3>
+
+<div class="card p-3">
+    <p><strong>Total Classes:</strong> {{ total }}</p>
+    <p><strong>Present:</strong> {{ present }}</p>
+    <p><strong>Absent:</strong> {{ absent }}</p>
+    <p><strong>Attendance %:</strong> {{ percentage }}%</p>
+</div>
+
+<hr>
+
+<h4>Day-wise Attendance</h4>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for a in records %}
+        <tr>
+            <td>{{ a.date }}</td>
+            <td>
+                {% if a.status == "present" %}
+                    <span style="color: green; font-weight: bold;">Present</span>
+                {% else %}
+                    <span style="color: red; font-weight: bold;">Absent</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="2">No attendance records yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
